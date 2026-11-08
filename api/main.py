@@ -173,3 +173,6 @@ def get_profile():
 @app.put("/api/profile", response_model=Profile)
 def put_profile(p: Profile):
     return db.put_profile(p)
+
+# DEP-02 drill: deliberate syntax error, reverted right after
+def broken(:
