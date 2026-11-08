@@ -4,11 +4,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p 3000"
+    "start": "next start -p 3000",
+    "postinstall": "node -e \"require('fs').cpSync('node_modules/@mediapipe/tasks-vision/wasm','public/mediapipe/wasm',{recursive:true})\""
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "5.1.0",
     "@fontsource/poppins": "5.1.0",
+    "@mediapipe/tasks-vision": "^1.2.2",
     "framer-motion": "11.11.17",
     "next": "14.2.35",
     "react": "18.3.1",

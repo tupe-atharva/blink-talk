@@ -26,3 +26,4 @@ api/audio_cache/*
 .idea/
 .ipynb_checkpoints/
 ml/recordings/*.json
+web/public/mediapipe/

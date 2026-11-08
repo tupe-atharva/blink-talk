@@ -98,10 +98,12 @@
     "p_min": 0.5,
     "consec": {
       "select": 2,
-      "move": 4,
+      "move": 6,
       "undo": 2
     },
-    "rearm_p_idle": 0.5
+    "rearm_p_idle": 0.5,
+    "select_min_s": 0.6,
+    "head_gate_deg": 8.0
   },
   "definitions": {
     "h": "lookA - lookB",
@@ -121,5 +123,6 @@
     "omwaikar",
     "udayanjadhav",
     "yashvarpe"
-  ]
+  ],
+  "trees_file": "signal_trees.json"
 }
