@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import os
 import re
+from datetime import datetime, timedelta, timezone
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as _FutureTimeout
 from typing import Any
@@ -23,8 +24,10 @@ from pydantic import BaseModel
 
 load_dotenv()
 
-MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
-FALLBACK_MODEL = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.5-flash")
+# `or` (not a getenv default) so an empty `GEMINI_MODEL=` in .env still falls back
+MODEL = os.getenv("GEMINI_MODEL") or "gemini-3.5-flash-lite"
+FALLBACK_MODEL = os.getenv("GEMINI_FALLBACK_MODEL") or "gemini-3.5-flash"
+LOCAL_TZ = os.getenv("LOCAL_TZ") or "America/New_York"   # used when the frontend sends UTC (…Z)
 TIMEOUT_S = 3.5
 N_PHRASES = 6
 MAX_WORDS = 8
@@ -41,7 +44,6 @@ Rules:
   For "can I get you anything?": lead with the profile's needs.
 - Replies 3-5 stay on the caregiver's topic first; use profile needs, people and preferences only when they fit.
   Do not mention the same preference in every answer.
-- Only mention people who are in the profile.
 - Reply 6 is always a short way to defer, like "Not now, thanks" or "Later, please".
 - Never give medical advice, diagnoses or medication instructions.
 - If the caregiver said nothing, suggest useful openers for the time of day."""
@@ -81,9 +83,34 @@ def _get(obj: Any, key: str, default: Any = None) -> Any:
     return getattr(obj, key, default)
 
 
+def _tz():
+    try:
+        from zoneinfo import ZoneInfo
+        return ZoneInfo(LOCAL_TZ)
+    except Exception:  # no tz database on the server → assume US Eastern
+        return timezone(timedelta(hours=-5))
+
+
+def _local_dt(local_time: str) -> datetime | None:
+    """Parse ISO times like '2026-11-08T02:05:00.000Z' or '...-05:00' and convert to local time."""
+    try:
+        dt = datetime.fromisoformat((local_time or "").strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return dt.astimezone(_tz()) if dt.tzinfo else dt
+
+
 def _hour(local_time: str) -> int:
+    dt = _local_dt(local_time)
+    if dt:
+        return dt.hour
     m = re.search(r"(\d{1,2}):(\d{2})", local_time or "")
     return int(m.group(1)) % 24 if m else 12
+
+
+def _pretty_time(local_time: str) -> str:
+    dt = _local_dt(local_time)
+    return dt.strftime("%A %I:%M %p").replace(" 0", " ") if dt else (local_time or "unknown")
 
 
 def _time_defaults(local_time: str) -> list[str]:
@@ -120,7 +147,7 @@ def build_prompt(transcript: str | None, history: list[Any], profile: Any, local
         return ", ".join(_get(profile, key, []) or []) or "none"
 
     lines = [
-        f"Local time: {local_time}",
+        f"Local time: {_pretty_time(local_time)}",
         f"User: {_get(profile, 'name', 'the user')}",
         f"Caregivers: {join('caregivers')}",
         f"Needs: {join('needs')}",
