@@ -1,0 +1,90 @@
+{
+  "classifier": {
+    "eval": "leave-one-person-out",
+    "people": [
+      "atharvatupe",
+      "omwaikar",
+      "udayanjadhav",
+      "yashvarpe"
+    ],
+    "per_class_recall": {
+      "idle": 0.995,
+      "natural_blink": 0.986,
+      "long_blink": 1.0,
+      "left": 0.945,
+      "right": 0.975,
+      "brow_up": 0.88
+    },
+    "per_person_accuracy": {
+      "atharvatupe": 0.966,
+      "omwaikar": 0.985,
+      "udayanjadhav": 0.992,
+      "yashvarpe": 0.996
+    },
+    "windows": 11945
+  },
+  "detection_classifier": {
+    "brow_up": {
+      "detected": 27,
+      "trials": 36,
+      "rate": 0.75
+    },
+    "left": {
+      "detected": 38,
+      "trials": 48,
+      "rate": 0.792
+    },
+    "long_blink": {
+      "detected": 57,
+      "trials": 60,
+      "rate": 0.95
+    },
+    "right": {
+      "detected": 48,
+      "trials": 48,
+      "rate": 1.0
+    }
+  },
+  "false_activations_per_min": [
+    {
+      "person": "atharvatupe",
+      "minutes": 2.09,
+      "rules_select_per_min": 0.96,
+      "rules_move_per_min": 23.5,
+      "rules_undo_per_min": 0.0,
+      "clf_select_per_min": 1.44,
+      "clf_move_per_min": 0.0,
+      "clf_undo_per_min": 0.0
+    },
+    {
+      "person": "omwaikar",
+      "minutes": 2.08,
+      "rules_select_per_min": 0.48,
+      "rules_move_per_min": 31.68,
+      "rules_undo_per_min": 1.92,
+      "clf_select_per_min": 0.96,
+      "clf_move_per_min": 0.0,
+      "clf_undo_per_min": 1.44
+    },
+    {
+      "person": "udayanjadhav",
+      "minutes": 2.08,
+      "rules_select_per_min": 0.0,
+      "rules_move_per_min": 16.35,
+      "rules_undo_per_min": 0.0,
+      "clf_select_per_min": 0.0,
+      "clf_move_per_min": 0.0,
+      "clf_undo_per_min": 0.0
+    },
+    {
+      "person": "yashvarpe",
+      "minutes": 2.09,
+      "rules_select_per_min": 0.48,
+      "rules_move_per_min": 12.95,
+      "rules_undo_per_min": 0.48,
+      "clf_select_per_min": 0.48,
+      "clf_move_per_min": 0.0,
+      "clf_undo_per_min": 0.0
+    }
+  ]
+}

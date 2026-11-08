@@ -41,6 +41,7 @@ Rules:
   For "can I get you anything?": lead with the profile's needs.
 - Replies 3-5 stay on the caregiver's topic first; use profile needs, people and preferences only when they fit.
   Do not mention the same preference in every answer.
+- Only mention people who are in the profile.
 - Reply 6 is always a short way to defer, like "Not now, thanks" or "Later, please".
 - Never give medical advice, diagnoses or medication instructions.
 - If the caregiver said nothing, suggest useful openers for the time of day."""
