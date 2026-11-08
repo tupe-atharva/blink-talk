@@ -25,3 +25,4 @@ api/audio_cache/*
 .vscode/
 .idea/
 .ipynb_checkpoints/
+ml/recordings/*.json
