@@ -1,0 +1,10 @@
+lightgbm
+onnxmltools
+onnxruntime
+numpy
+pandas
+matplotlib
+jupyter
+ipykernel
+google-genai
+python-dotenv
