@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BlinkTalk recorder</title>
+<style>
+  body { margin:0; font-family: system-ui, sans-serif; background:#111; color:#eee; overflow:hidden; }
+  #stage { position:fixed; inset:0; }
+  #dot { position:absolute; width:44px; height:44px; border-radius:50%; background:#4af; left:50%; top:50%;
+         transform:translate(-50%,-50%); transition:left .12s; box-shadow:0 0 30px #4af; }
+  #prompt { position:absolute; top:10%; width:100%; text-align:center; font-size:46px; font-weight:700; }
+  #sub { position:absolute; top:20%; width:100%; text-align:center; font-size:22px; color:#aaa; }
+  #panel { position:absolute; left:16px; bottom:16px; background:#000c; padding:12px; border-radius:10px;
+           font-size:14px; width:280px; }
+  video { width:256px; transform:scaleX(-1); border-radius:8px; display:block; margin-bottom:8px; }
+  .row { display:flex; justify-content:space-between; }
+  .bar { height:8px; background:#333; margin:2px 0 6px; border-radius:4px; }
+  .bar > div { height:100%; background:#4af; width:0; border-radius:4px; }
+  button, input { font-size:14px; margin:4px 4px 0 0; padding:6px 10px; border-radius:6px; border:0; }
+  button { background:#2b6cb0; color:#fff; cursor:pointer; } button:disabled { background:#444; color:#888; }
+  #status { margin-top:6px; color:#8f8; min-height:18px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="prompt">Loading MediaPipe…</div>
+  <div id="sub"></div>
+  <div id="dot"></div>
+</div>
+
+<div id="panel">
+  <video id="video" autoplay playsinline muted></video>
+  <div class="row"><span>blink</span><span id="vblink">-</span></div><div class="bar"><div id="bblink"></div></div>
+  <div class="row"><span>lookA</span><span id="vlookA">-</span></div><div class="bar"><div id="blookA"></div></div>
+  <div class="row"><span>lookB</span><span id="vlookB">-</span></div><div class="bar"><div id="blookB"></div></div>
+  <div class="row"><span>brow</span><span id="vbrow">-</span></div><div class="bar"><div id="bbrow"></div></div>
+  <div>yaw <span id="vyaw">-</span>° · pitch <span id="vpitch">-</span>° · fps <span id="vfps">-</span></div>
+  <input id="person" placeholder="your name" size="12">
+  <br>
+  <button id="btnGuided" disabled>Guided (~3 min)</button>
+  <button id="btnNormal" disabled>Normal behavior (2 min)</button>
+  <br>
+  <button id="btnStop">Stop</button>
+  <button id="btnSave">Download</button>
+  <div id="status"></div>
+</div>
+
+<script type="module">
+import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs";
+
+const $ = id => document.getElementById(id);
+const video = $("video");
+const r3 = x => Math.round(x * 1000) / 1000;
+
+let landmarker, bsNames = null, lastVideoTime = -1;
+let frames = [], recording = false, abort = false;
+let label = "idle", trial = -1, trialId = 0, session = "", t0 = 0;
+let fpsCount = 0, fpsT = performance.now();
+
+// ---------- MediaPipe ----------
+async function init() {
+  const fileset = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm");
+  landmarker = await FaceLandmarker.createFromOptions(fileset, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+      delegate: "GPU",
+    },
+    runningMode: "VIDEO",
+    numFaces: 1,
+    outputFaceBlendshapes: true,
+    outputFacialTransformationMatrixes: true,
+  });
+  video.srcObject = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false });
+  await video.play();
+  ui("Ready", "Type your name, then press Guided");
+  $("btnGuided").disabled = $("btnNormal").disabled = false;
+  requestAnimationFrame(loop);
+}
+
+function features(res) {
+  const cats = res.faceBlendshapes?.[0]?.categories;
+  if (!cats) return { faceFound: false, blink: 0, lookA: 0, lookB: 0, brow: 0, yaw: 0, pitch: 0, bs: null };
+  if (!bsNames) bsNames = cats.map(c => c.categoryName);
+  const s = {};
+  for (const c of cats) s[c.categoryName] = c.score;
+  let yaw = 0, pitch = 0;
+  const m = res.facialTransformationMatrixes?.[0]?.data;   // 4x4, column-major
+  if (m) {
+    yaw = Math.atan2(m[8], m[10]) * 180 / Math.PI;
+    pitch = Math.asin(Math.max(-1, Math.min(1, -m[9]))) * 180 / Math.PI;
+  }
+  return {
+    faceFound: true,
+    blink: r3((s.eyeBlinkLeft + s.eyeBlinkRight) / 2),
+    lookA: r3((s.eyeLookOutLeft + s.eyeLookInRight) / 2),
+    lookB: r3((s.eyeLookInLeft + s.eyeLookOutRight) / 2),
+    brow: r3(s.browInnerUp),
+    yaw: r3(yaw),
+    pitch: r3(pitch),
+    bs: cats.map(c => r3(c.score)),
+  };
+}
+
+function loop() {
+  if (video.currentTime !== lastVideoTime) {
+    lastVideoTime = video.currentTime;
+    const now = performance.now();
+    const f = features(landmarker.detectForVideo(video, now));
+    show(f);
+    if (recording) frames.push({ t: r3(now - t0), label, trial, ...f });
+    fpsCount++;
+    if (now - fpsT > 1000) {
+      $("vfps").textContent = fpsCount; fpsCount = 0; fpsT = now;
+      if (recording) $("status").textContent = `recording… ${frames.length} frames`;
+    }
+  }
+  requestAnimationFrame(loop);
+}
+
+function show(f) {
+  for (const k of ["blink", "lookA", "lookB", "brow"]) {
+    $("v" + k).textContent = f.faceFound ? f[k].toFixed(2) : "no face";
+    $("b" + k).style.width = (f[k] * 100) + "%";
+  }
+  $("vyaw").textContent = f.yaw.toFixed(0);
+  $("vpitch").textContent = f.pitch.toFixed(0);
+}
+
+// ---------- helpers ----------
+const ac = new AudioContext();
+function beep(freq, ms = 120) {
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.frequency.value = freq; g.gain.value = 0.15;
+  o.connect(g); g.connect(ac.destination);
+  o.start(); o.stop(ac.currentTime + ms / 1000);
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function wait(ms) {
+  const end = performance.now() + ms;
+  while (performance.now() < end) { if (abort) throw new Error("stopped"); await sleep(20); }
+}
+function ui(p, s = "", dot = "center") {
+  $("prompt").textContent = p;
+  $("sub").textContent = s;
+  $("dot").style.left = dot === "left" ? "4%" : dot === "right" ? "96%" : "50%";
+}
+
+// hold one label for N seconds
+async function hold(name, secs, p, s) {
+  label = name; trial = trialId++;
+  for (let k = secs; k > 0; k--) { ui(p, `${s} · ${k}s`); await wait(1000); }
+  label = "idle"; trial = -1;
+}
+
+// repeated cued trials: rest (idle) → cue (label) → short tail (label, for reaction delay) → idle
+async function trials(name, n, { cue, sub, cueMs, restMs, dot = "center", beeps = false }) {
+  for (let i = 0; i < n; i++) {
+    label = "idle"; trial = -1;
+    ui("Relax", `${sub} · next in a moment (${i + 1}/${n})`);
+    await wait(restMs + Math.random() * 700);       // random gap so people can't anticipate
+    label = name; trial = trialId++;
+    ui(cue, `${i + 1}/${n}`, dot);
+    if (beeps) beep(440);
+    await wait(cueMs);
+    if (beeps) beep(880);
+    ui("…", "", dot);
+    await wait(400);
+    label = "idle"; trial = -1;
+    ui("Relax", "");
+  }
+}
+
+// ---------- protocols ----------
+async function guided() {
+  await hold("idle", 15, "Look at the dot and relax", "blink normally, don't move");
+  await trials("natural_blink", 8, { cue: "Blink once (normally)", sub: "quick normal blinks", cueMs: 700, restMs: 1500 });
+  await trials("long_blink", 10, { cue: "CLOSE eyes — open at 2nd beep", sub: "long blinks", cueMs: 1200, restMs: 2000, beeps: true });
+  await trials("left", 8, { cue: "Look at the dot — eyes only", sub: "look LEFT, keep head still", cueMs: 1200, restMs: 1500, dot: "left" });
+  await trials("right", 8, { cue: "Look at the dot — eyes only", sub: "look RIGHT, keep head still", cueMs: 1200, restMs: 1500, dot: "right" });
+  await trials("brow_up", 6, { cue: "Raise your eyebrows", sub: "eyebrow raises", cueMs: 1200, restMs: 2000 });
+  await hold("idle", 15, "Look at the dot and relax", "almost done");
+}
+
+async function normal() {
+  label = "idle"; trial = -1;
+  for (let s = 120; s > 0; s--) {
+    ui("Act naturally", `talk, laugh, look around — DON'T do the gestures · ${s}s`);
+    await wait(1000);
+  }
+}
+
+async function run(kind) {
+  if (!$("person").value.trim()) { $("status").textContent = "type your name first"; return; }
+  ac.resume();
+  abort = false; frames = []; trialId = 0; session = kind;
+  $("btnGuided").disabled = $("btnNormal").disabled = true;
+  t0 = performance.now(); recording = true;
+  let stopped = false;
+  try {
+    ui("Get ready", "starting in 3 s"); await wait(3000);
+    if (kind === "guided") await guided(); else await normal();
+    ui("Done!", "downloading file…");
+  } catch { stopped = true; ui("Stopped", "press Download to save what was recorded"); }
+  recording = false; label = "idle"; trial = -1;
+  $("btnGuided").disabled = $("btnNormal").disabled = false;
+  if (!stopped) save();
+}
+
+function save() {
+  if (!frames.length) { $("status").textContent = "nothing recorded"; return; }
+  const person = $("person").value.trim().toLowerCase().replace(/\W+/g, "_");
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+  const data = { person, session, created: new Date().toISOString(), userAgent: navigator.userAgent, bsNames, frames };
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" }));
+  a.download = `${person}_${session}_${stamp}.json`;
+  a.click();
+  $("status").textContent = `saved ${frames.length} frames → ${a.download}`;
+}
+
+$("btnGuided").onclick = () => run("guided");
+$("btnNormal").onclick = () => run("normal");
+$("btnStop").onclick = () => { abort = true; };
+$("btnSave").onclick = save;
+
+init().catch(e => { ui("Error", e.message); console.error(e); });
+</script>
+</body>
+</html>

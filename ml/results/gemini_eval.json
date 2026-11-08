@@ -1,0 +1,339 @@
+{
+  "best": "gemini-3.5-flash-lite",
+  "n_tests": 20,
+  "summary": {
+    "gemini-3.5-flash-lite": {
+      "hit_rate": 0.75,
+      "p50_s": 0.804100513458252,
+      "p95_s": 0.9061980247497559,
+      "over_3_5s": 0,
+      "thinking": "include_thoughts=None thinking_budget=None thinking_level=<ThinkingLevel.MINIMAL: 'MINIMAL'>"
+    }
+  },
+  "results": {
+    "gemini-3.5-flash-lite": {
+      "hit_rate": 0.75,
+      "p50_s": 0.804100513458252,
+      "p95_s": 0.9061980247497559,
+      "over_3_5s": 0,
+      "thinking": "include_thoughts=None thinking_budget=None thinking_level=<ThinkingLevel.MINIMAL: 'MINIMAL'>",
+      "rows": [
+        {
+          "q": "Do you want water or juice?",
+          "accept": [
+            "juice"
+          ],
+          "phrases": [
+            "Juice please",
+            "Water please",
+            "Apple juice sounds good",
+            "I am quite thirsty",
+            "Just a little water",
+            "Not now, thanks"
+          ],
+          "latency": 0.7464849948883057,
+          "hit": true
+        },
+        {
+          "q": "Are you in any pain right now?",
+          "accept": [
+            "yes"
+          ],
+          "phrases": [
+            "Yes",
+            "No",
+            "A little bit",
+            "My back hurts",
+            "Change my position please",
+            "Later, please"
+          ],
+          "latency": 0.8022489547729492,
+          "hit": true
+        },
+        {
+          "q": "Are you cold?",
+          "accept": [
+            "no"
+          ],
+          "phrases": [
+            "Yes, I am cold",
+            "No, I am fine",
+            "Please close the window",
+            "Adjust my blanket please",
+            "Turn up the heat",
+            "Not now, thanks"
+          ],
+          "latency": 0.7752490043640137,
+          "hit": true
+        },
+        {
+          "q": "Do you want me to turn on the TV?",
+          "accept": [
+            "yes"
+          ],
+          "phrases": [
+            "Yes, turn on the Beatles",
+            "No, I am too tired",
+            "Put on music instead",
+            "Let us listen to songs",
+            "I want some quiet time",
+            "Not now, thanks"
+          ],
+          "latency": 0.9061980247497559,
+          "hit": true
+        },
+        {
+          "q": "Do you want to sit up a bit?",
+          "accept": [
+            "yes",
+            "sit up"
+          ],
+          "phrases": [
+            "Yes please help me sit up",
+            "No I want to stay down",
+            "Let us open the blinds",
+            "I need my water now",
+            "Can you call Sara please",
+            "Not now thanks"
+          ],
+          "latency": 0.8402760028839111,
+          "hit": true
+        },
+        {
+          "q": "How are you feeling today?",
+          "accept": [
+            "tired"
+          ],
+          "phrases": [
+            "I need some water please",
+            "Please help me change position",
+            "My throat needs suction",
+            "I want apple juice",
+            "Play the Beatles music",
+            "Not now, thanks"
+          ],
+          "latency": 0.8317241668701172,
+          "hit": false
+        },
+        {
+          "q": "Do you need the bathroom?",
+          "accept": [
+            "yes",
+            "bathroom"
+          ],
+          "phrases": [
+            "Yes, I need the bathroom",
+            "No, I am good",
+            "Help me change position please",
+            "I would like some water",
+            "Can you open the blinds",
+            "Not now, thanks"
+          ],
+          "latency": 0.7876369953155518,
+          "hit": true
+        },
+        {
+          "q": "Do you want me to read to you?",
+          "accept": [
+            "not now",
+            "later"
+          ],
+          "phrases": [
+            "Yes please read to me",
+            "No thank you",
+            "Read a Beatles book",
+            "Maybe later today",
+            "I am tired now",
+            "Not now thanks"
+          ],
+          "latency": 0.7729027271270752,
+          "hit": true
+        },
+        {
+          "q": "Is the music too loud?",
+          "accept": [
+            "too loud",
+            "yes",
+            "turn it down",
+            "lower"
+          ],
+          "phrases": [
+            "Yes, it is too loud",
+            "No, it is fine",
+            "Play the Beatles instead",
+            "I like this song",
+            "Turn it down a bit",
+            "Later, please"
+          ],
+          "latency": 0.7846381664276123,
+          "hit": true
+        },
+        {
+          "q": "Did you sleep well last night?",
+          "accept": [
+            "no",
+            "not well",
+            "didn't sleep"
+          ],
+          "phrases": [
+            "Yes I slept very well",
+            "No I did not sleep",
+            "I am still very tired",
+            "My back hurts a bit",
+            "I woke up quite early",
+            "Not now, thanks"
+          ],
+          "latency": 0.8241288661956787,
+          "hit": true
+        },
+        {
+          "q": "Who should I call?",
+          "accept": [
+            "sara"
+          ],
+          "phrases": [
+            "Call my daughter Sara now",
+            "Call Alex on the phone",
+            "Sara should be calling soon",
+            "Talk to Priya about this",
+            "Reach out to my husband",
+            "Later, please"
+          ],
+          "latency": 0.8059520721435547,
+          "hit": true
+        },
+        {
+          "q": "Do you want the blinds open or closed?",
+          "accept": [
+            "open"
+          ],
+          "phrases": [
+            "Open please",
+            "Closed please",
+            "Let the light in",
+            "I like the view",
+            "It is too bright",
+            "Later please"
+          ],
+          "latency": 0.771043062210083,
+          "hit": true
+        },
+        {
+          "q": "Are you hungry?",
+          "accept": [
+            "yes",
+            "hungry"
+          ],
+          "phrases": [
+            "Yes, I am quite hungry",
+            "No, I am not hungry",
+            "I would love some soup",
+            "Just a very small portion",
+            "Can we wait a bit",
+            "Not now, thanks"
+          ],
+          "latency": 0.8736178874969482,
+          "hit": true
+        },
+        {
+          "q": "Do you want your blanket?",
+          "accept": [
+            "yes",
+            "blanket"
+          ],
+          "phrases": [
+            "Yes please",
+            "No thank you",
+            "It is a bit warm",
+            "My feet feel cold",
+            "Cover my legs please",
+            "Later, please"
+          ],
+          "latency": 0.6638507843017578,
+          "hit": true
+        },
+        {
+          "q": "Can I get you anything?",
+          "accept": [
+            "water"
+          ],
+          "phrases": [
+            "ERROR 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your cu"
+          ],
+          "latency": null,
+          "hit": false
+        },
+        {
+          "q": "Is your position comfortable?",
+          "accept": [
+            "no",
+            "move",
+            "uncomfortable",
+            "adjust"
+          ],
+          "phrases": [
+            "Yes, it is comfortable.",
+            "No, please move me.",
+            "Adjust my shoulders a bit.",
+            "My back aches right now.",
+            "Can we try sitting up?",
+            "Not now, thanks."
+          ],
+          "latency": 1.0056440830230713,
+          "hit": true
+        },
+        {
+          "q": "Want to listen to some music?",
+          "accept": [
+            "beatles"
+          ],
+          "phrases": [
+            "ERROR 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your cu"
+          ],
+          "latency": null,
+          "hit": false
+        },
+        {
+          "q": "Should I turn off the light?",
+          "accept": [
+            "yes"
+          ],
+          "phrases": [
+            "ERROR 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your cu"
+          ],
+          "latency": null,
+          "hit": false
+        },
+        {
+          "q": "Priya is here, do you want to see her?",
+          "accept": [
+            "yes"
+          ],
+          "phrases": [
+            "ERROR 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your cu"
+          ],
+          "latency": null,
+          "hit": false
+        },
+        {
+          "q": "Do you need suction?",
+          "accept": [
+            "yes",
+            "suction"
+          ],
+          "phrases": [
+            "Yes, I need suction",
+            "No, I am okay",
+            "Please clear my airway",
+            "Can we wait a moment",
+            "Let us do it gently",
+            "Not now, thanks"
+          ],
+          "latency": 0.8320400714874268,
+          "hit": true
+        }
+      ]
+    }
+  },
+  "system": "You suggest spoken replies for a person who cannot speak and picks a reply with their eyes.\nWrite as that person, in the first person.\n\nRules:\n- Return exactly 6 replies, each at most 6 words, plain words, no emojis, no quotes.\n- Replies 1-2 must directly answer what the caregiver just said.\n  For a yes/no question: reply 1 starts with \"Yes\", reply 2 starts with \"No\".\n  For a choice (\"A or B?\"): replies 1-2 pick each option (the profile's preferred option first).\n  For an open question (\"anything?\", \"how are you?\"): lead with the profile's needs.\n- Replies 3-5 stay on the caregiver's topic first; use profile needs, people and preferences only when they fit.\n  Do not mention the same preference in every answer.\n- Reply 6 is always a short way to defer, like \"Not now, thanks\" or \"Later, please\".\n- Never give medical advice, diagnoses or medication instructions.\n- If the caregiver said nothing, suggest useful openers for the time of day."
+}
